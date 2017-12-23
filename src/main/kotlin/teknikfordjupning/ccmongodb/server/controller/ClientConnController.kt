@@ -6,45 +6,56 @@ import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
-import teknikfordjupning.ccmongodb.server.db.event.Event
-import teknikfordjupning.ccmongodb.server.db.schedule.getLastEvents
+import teknikfordjupning.ccmongodb.db.event.Event
+import teknikfordjupning.ccmongodb.db.event.EventRepository
+import teknikfordjupning.ccmongodb.db.schedule.getAreas
 
 
 @Controller
-class EventsController() {
+class ClientConnController(eventRepository: EventRepository) {
 
+    val repository: EventRepository = eventRepository
     @Autowired
     private lateinit var template: SimpMessagingTemplate
 
-    @MessageMapping("/getevent")
-    @SendTo("/topic/latest")
+    var localIdList: List<String> = emptyList()
+
+    @MessageMapping("/init")
+    @SendTo("/topic/all")
     @Throws(Exception::class)
-    fun greeting(x: String): String {
-        Thread.sleep(1000) // simulated delay
-        template.convertAndSend("/topic/test", "TTTTTTTEST")
-         return "hej " + x
+    fun init(x: String): String {
+        val events = repository.findAll()
+        template.convertAndSend("/topic/new_event", events.reversed())
+        template.convertAndSend("/topic/areas", getAreas())
+println("INIIIIT")
+        return "hej " + x
     }
 
-    //_________________________________________________TEST
-   /* @SubscribeMapping("/geteventt")
-    @SendTo("/topic/test")
-    @Throws(Exception::class)*/
-    fun test(event: Event): Unit {
-        Thread.sleep(1000) // simulated delay
-       // println(event.id)
-        template.convertAndSend("/topic/test", event.description)
-      //  return event.title_location
-        //return event
+
+    fun sendAll() {
+        println("sends now")
+        val events = repository.findAll()
+        template.convertAndSend("/topic/new_event", events.reversed())
     }
-    //_________________________________________________TEST
 
+    fun sendToSpecifiedArea(event: Event) {
 
-    @Scheduled(fixedDelay = 10_000)
-    fun getLatest() {
-        val events = getLastEvents()
-        template.convertAndSend("/topic/test", events[0].date_human)
-        // val latest = getLastEvents()
-        //this.repository.save(latest)
+        template.convertAndSend("/topic/new_event/${event.administrative_area_level_1}", arrayListOf(event))
+
+    }
+
+    @Scheduled(fixedDelay = 15_000)
+    private fun checkNew() {
+        sendAll()
+        val dbIds = repository.findAll().map { it.id }
+
+        if (!localIdList.containsAll(dbIds)) {
+            repository.findAll()
+                    .filter { it.id !in localIdList }
+                    .forEach { sendToSpecifiedArea(it) }
+        }
+
+        localIdList = dbIds.toMutableList()
 
     }
 }

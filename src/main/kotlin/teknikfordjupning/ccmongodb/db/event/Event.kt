@@ -1,4 +1,4 @@
-package teknikfordjupning.ccmongodb.server.db.event
+package teknikfordjupning.ccmongodb.db.event
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.IndexDirection

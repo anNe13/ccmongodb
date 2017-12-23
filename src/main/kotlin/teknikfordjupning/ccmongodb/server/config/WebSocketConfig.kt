@@ -12,6 +12,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 class WebSocketConfig : AbstractWebSocketMessageBrokerConfigurer() {
 
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
+        //config.enableStompBrokerRelay("/topic").setRelayHost("192.168.0.101")
         config.enableSimpleBroker("/topic") //BRINGS TO CLIENT
         config.setApplicationDestinationPrefixes("/app")// RECIVE FROM CLIENT WHEN /app/lastevent
     }

@@ -1,8 +1,8 @@
-package teknikfordjupning.ccmongodb.server.db.schedule
+package teknikfordjupning.ccmongodb.db.schedule
 
 import com.github.kittinunf.fuel.Fuel
 import org.json.JSONObject
-import teknikfordjupning.ccmongodb.server.db.event.Event
+import teknikfordjupning.ccmongodb.db.event.Event
 
 const val APP_PARAMETER = "app=studentproject_nackademin"
 const val BASE_URL = "https://brottsplatskartan.se/api"
@@ -19,8 +19,14 @@ fun getIdOfLatest(): String {
 
 }
 
+fun getAreas() : List<String>{
+    val (request, response, result) = Fuel.get("$BASE_URL/areas?$APP_PARAMETER").responseString()
+
+    return JSONObject(result.get()).getJSONObject("data").getJSONArray("areas")
+            .map { JSONObject(it.toString()).getString("administrative_area_level_1")}
+}
 fun getLastEvents(): List<Event> {
-    val (request, response, result) = Fuel.get("http://brottsplatskartan.se/api/events?limit=20&area=&location=&type=&page=1").responseString()
+    val (request, response, result) = Fuel.get("$BASE_URL/events?limit=20&area=&location=&type=&page=1$APP_PARAMETER").responseString()
 
     val theList = JSONObject(result.get()).getJSONArray("data")
             .map { parse(JSONObject(it.toString())) }

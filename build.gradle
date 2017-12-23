@@ -50,6 +50,8 @@ dependencies {
 
 	compile group: 'org.reactivemongo', name: 'reactivemongo_2.10', version: '0.12.7'
 
+	compile 'org.springframework:spring-messaging:4.3.12.RELEASE'
+
 
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
