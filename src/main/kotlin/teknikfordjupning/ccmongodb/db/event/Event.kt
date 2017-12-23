@@ -1,18 +1,17 @@
-package teknikfordjupning.ccmongodb.db.event
+package teknikfordjupning.ccmongodb.server.db.event
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.IndexDirection
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.io.Serializable
-import java.util.*
 
 
 @Document(collection = "Events")
 data class Event
 (
         @Id
-        val id: Int,
+        val id: String,
         val pubdate_iso8601: String,
         @Indexed(direction = IndexDirection.DESCENDING)
         val pubdate_unix: Int,
@@ -29,5 +28,5 @@ data class Event
 
 ): Serializable{
 
-        constructor() : this(0,"",0,"","","","","","","","","","")
+        constructor() : this("","",0,"","","","","","","","","","")
 }

@@ -1,8 +1,8 @@
-package teknikfordjupning.ccmongodb.db.data_fetcher
+package teknikfordjupning.ccmongodb.server.db.schedule
 
 import com.github.kittinunf.fuel.Fuel
 import org.json.JSONObject
-import teknikfordjupning.ccmongodb.db.event.Event
+import teknikfordjupning.ccmongodb.server.db.event.Event
 
 const val APP_PARAMETER = "app=studentproject_nackademin"
 const val BASE_URL = "https://brottsplatskartan.se/api"
@@ -31,7 +31,7 @@ fun getLastEvents(): List<Event> {
 fun parse(j: JSONObject): Event {
 
     return Event(
-            j.getInt("id"),
+            j.getInt("id").toString(),
             j.getString("pubdate_iso8601"),
             j.getString("pubdate_unix").toInt(),
             j.getString("title_type"),
